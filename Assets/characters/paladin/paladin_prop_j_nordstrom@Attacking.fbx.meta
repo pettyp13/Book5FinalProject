@@ -3,7 +3,22 @@ guid: 74fb794519dc8534fae07cf1b2c5b35e
 ModelImporter:
   serializedVersion: 21300
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: Paladin_diffuse
+    second: {fileID: 2800000, guid: da176e1f324a51d4d9d8f482a195dc07, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: Paladin_normal
+    second: {fileID: 2800000, guid: 4705efde3e46b604b80fcda6d8c96cc3, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: Paladin_specular
+    second: {fileID: 2800000, guid: a8b5aa5a5c9acb046965556a4677c4b2, type: 3}
   materials:
     materialImportMode: 2
     materialName: 0

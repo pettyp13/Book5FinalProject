@@ -4,27 +4,53 @@ using UnityEngine;
 
 public class CheckCollision : MonoBehaviour
 {
-    int damage = 20;
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    [Header("Damage done to targets")]
+    public int damage = 20;   // default fallback
 
-    // Update is called once per frame
-    void Update()
+    private void OnTriggerEnter(Collider other)
     {
-        
-    }
+        // 1) Safely compute damage from GameManager if it exists
+        GameObject gmObj = GameObject.Find("GameManager");
+        GameManager gm = null;
 
-	private void OnTriggerEnter(Collider other)
-	{
-        damage = GameObject.Find("GameManager").GetComponent<GameManager>().player.power / 2;
-        
-        if (other.GetComponent<Collider>().gameObject.tag == "target")
+        if (gmObj != null)
         {
-            other.GetComponent<Collider>().gameObject.GetComponent<ManageTargetHealth>().DecreaseHealth(damage);
-
+            gm = gmObj.GetComponent<GameManager>();
         }
-	}
+
+        if (gm != null && gm.player != null)
+        {
+            damage = gm.player.power / 2;
+        }
+        else
+        {
+            // Fallback so we don't crash if GameManager or player is missing
+            // You can change this number if you want stronger hits
+            damage = 20;
+            Debug.LogWarning("CheckCollision: GameManager or player missing, using default damage " + damage);
+        }
+
+        // 2) Only care about objects tagged "target"
+        if (!other.CompareTag("target"))
+        {
+            return;
+        }
+
+        // 3) Try to get the ManageTargetHealth component on the object or its parent
+        ManageTargetHealth target = other.GetComponent<ManageTargetHealth>();
+        if (target == null && other.transform.parent != null)
+        {
+            target = other.transform.parent.GetComponent<ManageTargetHealth>();
+        }
+
+        if (target != null)
+        {
+            target.DecreaseHealth(damage);
+            Debug.Log("Hit target '" + other.name + "' for " + damage + " damage. Remaining health: " + target.GetHealth());
+        }
+        else
+        {
+            Debug.LogWarning("CheckCollision: Hit object tagged 'target' but no ManageTargetHealth found on " + other.name);
+        }
+    }
 }

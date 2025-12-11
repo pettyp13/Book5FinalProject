@@ -4,89 +4,97 @@ using UnityEngine;
 
 public class ManageTargetHealth : MonoBehaviour
 {
-    // Start is called before the first frame update
-    [Range(100,1000)]
+    [Header("Enemy / Target Health")]
+    [Range(0, 1000)]
     public int health = 100;
 
+    // Flash effect variables
     float hitTimer;
     bool hitFlash;
     float alpha;
 
-
     void Start()
     {
-        alpha = 0.0f;
-        gameObject.transform.Find("Sphere").GetComponent<MeshRenderer>().material.color = new Color(1, 0, 0, alpha);
+        alpha = 0f;
+        hitFlash = false;
+        hitTimer = 0f;
+
+        // Make sure the sphere starts transparent
+        Transform sphere = transform.Find("Sphere");
+        if (sphere != null)
+        {
+            Renderer r = sphere.GetComponent<Renderer>();
+            if (r != null)
+            {
+                Color c = new Color(1f, 0f, 0f, alpha); // red with 0 transparency
+                r.material.color = c;
+            }
+        }
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (hitFlash)
+        if (!hitFlash)
+            return;
+
+        hitTimer += Time.deltaTime;
+
+        // Fade alpha toward 0 over 1 second
+        alpha -= Time.deltaTime;
+
+        if (alpha <= 0f)
         {
-            alpha -= Time.deltaTime;
-            gameObject.transform.Find("Sphere").GetComponent<Renderer>()
-                      .material.color = new Color(1, 0, 0, alpha);
-            if (alpha <=0)
+            alpha = 0f;
+            hitFlash = false;
+            hitTimer = 0f;
+        }
+
+        // Apply new alpha to sphere
+        Transform sphere = transform.Find("Sphere");
+        if (sphere != null)
+        {
+            Renderer r = sphere.GetComponent<Renderer>();
+            if (r != null)
             {
-
-                hitFlash = false;
-                alpha = 0;
+                Color c = r.material.color;
+                c.a = alpha;
+                r.material.color = c;
             }
-
         }
     }
 
-
-    public void SetHealth(int health)
+    // Set health safely
+    public void SetHealth(int newHealth)
     {
+        health = newHealth;
 
-        this.health = health;
-        if (this.health <=0)
+        if (health <= 0)
         {
-
-            this.health = 0;
+            health = 0;
             DestroyTarget();
         }
-
     }
+
+    // Read current health if needed
     public int GetHealth()
     {
+        return health;
+    }
 
-        return (this.health);
+    // Called when the sword hits the target
+    public void DecreaseHealth(int increment)
+    {
+        SetHealth(this.health - increment);
+
+        // Start flash effect
+        hitFlash = true;
+        alpha = 0.5f;   // initial flash opacity
+        hitTimer = 0f;
     }
 
     void DestroyTarget()
     {
-
-        GetComponent<ControlNPCGuard>().Dies();
-        Destroy(gameObject, 5);
-        GameObject.Find("GameManager").GetComponent<QuestSystem>().Notify(QuestSystem.possibleActions.destroy_one, gameObject.name);
-
+        // small delay so it looks like it dies
+        Destroy(gameObject, 0.2f);
     }
-
-    public void DecreaseHealth(int increment)
-    {
-        print("I am hit");
-        SetHealth(this.health - increment);
-        hitFlash = true;
-        alpha = .5f;
-        gameObject.GetComponent<ControlNPCGuard>().SetGuardType(ControlNPCGuard.GUARD_TYPE.CHASER);
-        AlertOtherGuards();
-    }
-
-    void AlertOtherGuards()
-    {
-
-        GameObject[] otherGuards;
-        otherGuards = GameObject.FindGameObjectsWithTag("target");
-        for (int i = 0; i < otherGuards.Length; i++)
-        {
-
-            otherGuards[i].GetComponent<ControlNPCGuard>().SetGuardType(ControlNPCGuard.GUARD_TYPE.CHASER);
-
-        }
-
-    }
-
 }
