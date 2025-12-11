@@ -1,0 +1,15 @@
+<quest name="Free the Villagers from the Tyran">
+ <stage id="0" name="Training Camp" description ="This is a training camp where you will get to master your skills before you start your quest." startingPointForPlayer ="-25,-1,-134">
+    <requirements>
+      
+    </requirements>
+
+    <results>
+      <result action = "Talk to" target ="Diana" xp = "10"/>
+      <result action = "Acquire a" target ="Apple" xp = "10"/>
+      <result action = "Destroy one" target ="NPC_Guard" xp = "10"/>
+      <result action = "Enter place called" target ="yellow_house" xp = "10"/>
+    </results>
+  </stage>
+ 
+</quest>
